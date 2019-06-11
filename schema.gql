@@ -1,0 +1,16 @@
+type Query {
+  cards(search: String): [Card]
+}
+
+type Card {
+  id: Int!
+  name: String!
+  desc: String!
+  type: String
+  atk: Int!
+  def: Int!
+  level: Int!
+  race: String
+  attribute: String
+  category: Int!
+}
