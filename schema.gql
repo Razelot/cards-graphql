@@ -1,5 +1,10 @@
 type Query {
-  cards(search: String): [Card]
+  cards(
+    search: String
+    types: [String]
+    races: [String]
+    attributes: [String]
+  ): [Card]
 }
 
 type Card {
