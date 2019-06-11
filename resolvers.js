@@ -2,7 +2,7 @@ const db = require("./database");
 const squel = require("squel");
 
 module.exports = {
-  cards: ({ search, types, races, attributes }) => {
+  allCards: async ({ first, offset, search, types, races, attributes }) => {
     let sql = squel
       .select()
       .from("datas")
@@ -103,6 +103,41 @@ module.exports = {
 
     sql.group("texts.name"); // remove duplicate cards from different sets
     // console.log(sql.toString());
-    return db.cardsDb.all(sql.toString());
+    return {
+      cards: db.cardsDb.all(sql.toString()),
+      totalCount: {
+        ...(await db.cardsDb.get(
+          squel
+            .select()
+            .from("datas")
+            .field("COUNT()", "totalCount")
+            .toString()
+        ))
+      }.totalCount
+    };
+  },
+  types: () => {
+    let sql = squel
+      .select()
+      .from("types")
+      .field("type", "name");
+    // console.log(sql.toString());
+    return db.defDb.all(sql.toString());
+  },
+  races: () => {
+    let sql = squel
+      .select()
+      .from("races")
+      .field("race", "name");
+    // console.log(sql.toString());
+    return db.defDb.all(sql.toString());
+  },
+  attributes: () => {
+    let sql = squel
+      .select()
+      .from("attributes")
+      .field("attribute", "name");
+    // console.log(sql.toString());
+    return db.defDb.all(sql.toString());
   }
 };

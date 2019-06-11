@@ -1,10 +1,22 @@
 type Query {
-  cards(
+  allCards(
     search: String
     types: [String]
     races: [String]
     attributes: [String]
-  ): [Card]
+    # pagination
+    first: Int
+    offset: Int
+  ): CardsResult
+
+  types: [Type]
+  races: [Race]
+  attributes: [Attribute]
+}
+
+type CardsResult {
+  cards: [Card]
+  totalCount: Int
 }
 
 type Card {
@@ -18,4 +30,19 @@ type Card {
   race: String
   attribute: String
   category: Int!
+}
+
+type Type {
+  id: Int!
+  name: String!
+}
+
+type Race {
+  id: Int!
+  name: String!
+}
+
+type Attribute {
+  id: Int!
+  name: String!
 }
