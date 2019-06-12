@@ -1,29 +1,22 @@
-const express = require("express");
-const graphqlHTTP = require("express-graphql");
-const rootValue = require("./resolvers");
-const port = process.env.PORT || 4000;
-const { buildSchema } = require("graphql");
-const { readFileSync } = require("fs");
+const { GraphQLServer } = require("graphql-yoga");
 const db = require("./database");
-
-let schema = readFileSync(__dirname + "/schema.gql", "utf8");
-schema = buildSchema(schema);
+const { typeDefs, resolvers } = require("./schema");
+const options = {
+  port: 8000,
+  endpoint: "/graphql",
+  subscriptions: "/subscriptions",
+  playground: "/playground"
+};
 
 async function main() {
-  const app = express();
-  app.use(
-    "/graphql",
-    graphqlHTTP({
-      schema,
-      rootValue,
-      graphiql: true
-    })
-  );
-
   try {
     await db.open();
-    app.listen(port);
-    console.log(`Running a GraphQL API server at localhost:${port}/graphql`);
+    const server = new GraphQLServer({ typeDefs, resolvers });
+    server.start(options, ({ port }) =>
+      console.log(
+        `Server started, listening on port ${port} for incoming requests.`
+      )
+    );
   } catch (error) {
     console.error(error.message);
     process.exit(1);

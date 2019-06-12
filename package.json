@@ -11,9 +11,7 @@
   "author": "Ezar Enanda",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "express-graphql": "^0.8.0",
-    "graphql": "^14.3.1",
+    "graphql-yoga": "^1.17.4",
     "sqlite": "^3.0.3",
     "squel": "^5.12.2"
   }

@@ -4,20 +4,20 @@ type Query {
     types: [String]
     races: [String]
     attributes: [String]
-    # pagination
-    first: Int
-    offset: Int
-  ): CardsResult
+  ): # pagination
+  # first: Int
+  # offset: Int
+  [Card]
 
   types: [Type]
   races: [Race]
   attributes: [Attribute]
 }
 
-type CardsResult {
-  cards: [Card]
-  totalCount: Int
-}
+# type CardsResult {
+#   cards: [Card]
+#   totalCount: Int
+# }
 
 type Card {
   id: Int!
