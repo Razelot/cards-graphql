@@ -3,7 +3,10 @@ const squel = require("squel");
 
 module.exports = {
   Query: {
-    allCards: async (_, { search, types, races, attributes }) => {
+    allCards: async (
+      _,
+      { search, types, races, attributes, page, pageSize }
+    ) => {
       let sql = squel
         .select()
         .from("datas")
@@ -22,7 +25,9 @@ module.exports = {
           "definitions.attributes",
           "attributes",
           "datas.attribute = definitions.attributes.id"
-        );
+        )
+        .group("texts.name") // remove duplicate cards from different sets;
+        .order("texts.name");
 
       if (search) {
         sql.where(
@@ -102,28 +107,53 @@ module.exports = {
           .where("attribute_filter.sum & datas.attribute > 0");
       }
 
-      sql.group("texts.name"); // remove duplicate cards from different sets
-      // console.log(sql.toString());
+      // START PAGE LOGIC
+      const total = {
+        ...(await db.cardsDb.get(
+          squel
+            .select()
+            .from(sql)
+            .field("COUNT()", "count")
+            .toString()
+        ))
+      }.count;
 
-      return db.cardsDb.all(sql.toString());
-      // return {
-      //   cards: db.cardsDb.all(sql.toString()),
-      //   totalCount: {
-      //     ...(await db.cardsDb.get(
-      //       squel
-      //         .select()
-      //         .from("datas")
-      //         .field("COUNT()", "totalCount")
-      //         .toString()
-      //     ))
-      //   }.totalCount
-      // };
+      let perPage = -1;
+      let lastPage = 1;
+      let currentPage = 1;
+      let from = 1;
+      let to = total;
+      if (page) {
+        perPage = pageSize || 10;
+        lastPage = Math.ceil(total / perPage);
+        currentPage = Math.min(page, lastPage);
+        from = (currentPage - 1) * perPage + 1;
+        to = Math.min(from + perPage - 1, total);
+        sql.offset((currentPage - 1) * perPage).limit(perPage);
+      }
+
+      const pageInfo = {
+        total,
+        pageSize: perPage,
+        currentPage,
+        lastPage,
+        from,
+        to
+      };
+      // END PAGE LOGIC
+
+      // console.log(sql.toString());
+      // return db.cardsDb.all(sql.toString());
+      return {
+        cards: db.cardsDb.all(sql.toString()),
+        pageInfo
+      };
     },
     types: () => {
       let sql = squel
         .select()
         .from("types")
-        .field("type", "name");
+        // .field("type", "name");
       // console.log(sql.toString());
       return db.defDb.all(sql.toString());
     },
@@ -131,7 +161,7 @@ module.exports = {
       let sql = squel
         .select()
         .from("races")
-        .field("race", "name");
+        // .field("race", "name");
       // console.log(sql.toString());
       return db.defDb.all(sql.toString());
     },
@@ -139,7 +169,7 @@ module.exports = {
       let sql = squel
         .select()
         .from("attributes")
-        .field("attribute", "name");
+        // .field("attribute", "name");
       // console.log(sql.toString());
       return db.defDb.all(sql.toString());
     }

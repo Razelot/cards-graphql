@@ -2,7 +2,7 @@ const { GraphQLServer } = require("graphql-yoga");
 const db = require("./database");
 const { typeDefs, resolvers } = require("./schema");
 const options = {
-  port: 8000,
+  port: process.env.PORT || 4000,
   endpoint: "/graphql",
   subscriptions: "/subscriptions",
   playground: "/playground"

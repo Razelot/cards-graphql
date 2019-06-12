@@ -4,20 +4,29 @@ type Query {
     types: [String]
     races: [String]
     attributes: [String]
-  ): # pagination
-  # first: Int
-  # offset: Int
-  [Card]
+    # pagination
+    page: Int
+    pageSize: Int
+  ): CardsResult
 
   types: [Type]
   races: [Race]
   attributes: [Attribute]
 }
 
-# type CardsResult {
-#   cards: [Card]
-#   totalCount: Int
-# }
+type CardsResult {
+  cards: [Card]
+  pageInfo: PageInfo
+}
+
+type PageInfo {
+  total: Int!
+  pageSize: Int!
+  currentPage: Int!
+  lastPage: Int!
+  from: Int!
+  to: Int!
+}
 
 type Card {
   id: Int!
@@ -34,15 +43,15 @@ type Card {
 
 type Type {
   id: Int!
-  name: String!
+  type: String!
 }
 
 type Race {
   id: Int!
-  name: String!
+  race: String!
 }
 
 type Attribute {
   id: Int!
-  name: String!
+  attribute: String!
 }
